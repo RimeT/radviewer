@@ -7,7 +7,10 @@ const clientRoot = path.resolve(here, '../client');
 
 export const VIEWER_URI = 'ui://radviewer/viewer.html';
 export const HTML_MIME = 'text/html;profile=mcp-app';
-export const UI_META = { 'zcode/csp': { unsafeEval: true, wasmUnsafeEval: true } };
+export const UI_META = {
+  ui: { csp: { connectDomains: [], resourceDomains: [] }, prefersBorder: false },
+  'openai/ui': { availableDisplayModes: ['inline', 'fullscreen'] },
+};
 
 let cached = '';
 

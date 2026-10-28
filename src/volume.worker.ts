@@ -13,13 +13,18 @@ interface WorkerRequest {
   maskParts?: ArrayBuffer[];
 }
 
-const worker = self as DedicatedWorkerGlobalScope;
+export interface VolumeWorkerScope {
+  onmessage: ((event: MessageEvent<WorkerRequest>) => void) | null;
+  postMessage: (data: unknown, transfers?: Transferable[]) => void;
+}
 
-worker.onmessage = (event: MessageEvent<WorkerRequest>) => {
-  void run(event.data);
-};
+export function installVolumeWorker(worker: VolumeWorkerScope): void {
+  worker.onmessage = (event: MessageEvent<WorkerRequest>) => {
+    void run(worker, event.data);
+  };
+}
 
-async function run(message: WorkerRequest): Promise<void> {
+async function run(worker: VolumeWorkerScope, message: WorkerRequest): Promise<void> {
   try {
     const report = (ratio: number) => {
       worker.postMessage({ id: message.id, op: 'progress', ratio });

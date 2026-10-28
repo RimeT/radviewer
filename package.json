@@ -1,6 +1,6 @@
 {
   "name": "radviewer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "license": "MIT",
   "description": "View DICOM, NIfTI, and NRRD studies on orthogonal slices and in 3D, with a paired mask.",
@@ -14,7 +14,7 @@
   "scripts": {
     "build:worker": "node scripts/build-worker.mjs",
     "build": "node scripts/build.mjs",
-    "check": "node scripts/check-package.mjs && node --test tests/host.test.mjs && node scripts/selfcheck.mjs",
+    "check": "node scripts/check-package.mjs && node --test tests/*.test.mjs && node scripts/selfcheck.mjs",
     "dev": "node scripts/build-worker.mjs && vite",
     "icon": "node scripts/write-icon.mjs"
   },

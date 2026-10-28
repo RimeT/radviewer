@@ -1,6 +1,6 @@
 {
   "name": "radviewer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "View DICOM, NIfTI, and NRRD studies, with a paired mask.",
   "author": { "name": "Rime" },
   "repository": "https://github.com/RimeT/radviewer",

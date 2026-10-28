@@ -1,5 +1,5 @@
 import * as esbuild from 'esbuild';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 const worker = spawnSync(process.execPath, ['scripts/build-worker.mjs'], { stdio: 'inherit' });
@@ -37,3 +37,11 @@ writeFileSync('miniapp/client/index.html', `<!doctype html>
   </body>
 </html>
 `);
+
+// Local marketplace installations copy only chatgpt/, so ship its runtime too.
+for (const directory of ['node', 'client']) {
+  cpSync(`miniapp/${directory}`, `chatgpt/miniapp/${directory}`, { recursive: true });
+}
+cpSync('skills/radviewer/SKILL.md', 'chatgpt/skills/radviewer/SKILL.md');
+cpSync('LICENSE', 'chatgpt/LICENSE');
+cpSync('icon.png', 'chatgpt/icon.png');

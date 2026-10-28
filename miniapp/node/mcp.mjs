@@ -72,6 +72,25 @@ export const TOOLS = [
     inputSchema: { type: 'object', additionalProperties: false, properties: {} },
     _meta: { ui: { visibility: ['app'] } },
   },
+  {
+    name: 'show_viewer',
+    title: 'RadViewer',
+    description: 'Open the RadViewer panel to browse a local DICOM, NIfTI or NRRD study. No path is required; the user can enter one in the panel.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: {} },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    _meta: { ui: SURFACE, 'openai/ui': { entrypoints: [{ type: 'thread' }] } },
+  },
+  {
+    name: 'read_file_chunk',
+    description: 'Viewer page only. Read a chunk of a file previously opened by read_file.',
+    inputSchema: {
+      type: 'object', additionalProperties: false,
+      properties: { id: { type: 'string', pattern: '^[0-9a-f]{16}$' }, index: { type: 'integer', minimum: 0 } },
+      required: ['id', 'index'],
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    _meta: { ui: { visibility: ['app'] } },
+  },
 ];
 
 function reply(id, result) {
@@ -91,6 +110,7 @@ function toolResult(outcome) {
     isError: false,
   };
   if (outcome.structured) result.structuredContent = outcome.structured;
+  if (outcome.meta) result._meta = outcome.meta;
   return result;
 }
 
@@ -110,7 +130,7 @@ export async function dispatchMessage(message, callTool, options = {}) {
         tools: { listChanged: false },
         resources: { listChanged: false },
       },
-      serverInfo: { name: 'radviewer', version: '0.1.1' },
+      serverInfo: { name: 'radviewer', version: '0.1.2' },
     });
   }
   if (message.method === 'ping') return reply(id, {});

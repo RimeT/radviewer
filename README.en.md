@@ -33,7 +33,7 @@ Give the assistant an absolute path, such as `D:/studies/case`.
 - `list_studies` lists the studies in that directory and one level of subfolders.
 - `open_study` opens one file, or the first study in a folder.
 
-The RadViewer page opens on the right in MiniMax Code and in the Zcode session sidebar. ChatGPT Work desktop calls the same local tool and receives the selected path. ChatGPT Work on the web cannot run that local process. `node` has to be available.
+The RadViewer page opens on the right in MiniMax Code and in the Zcode session sidebar. ChatGPT Work desktop uses local MCP to open the viewer beside the conversation. Use a locally running conversation; a cloud-only conversation cannot read paths on your computer. `node` has to be available.
 
 ### MiniMax Code
 
@@ -59,7 +59,19 @@ Settings → Plugins → Create → Add marketplace, and enter `RimeT/radviewer`
 codex plugin marketplace add RimeT/radviewer
 ```
 
-Restart the desktop app, then choose RadViewer in the plugin directory and install it.
+Requires the ChatGPT desktop app, local execution, and Node.js 20 or later on PATH. The command registers the GitHub marketplace; users do not need to clone the repository or run npm install.
+
+Restart the desktop app. In the Plugins Directory source picker, choose the RadViewer marketplace, then install and enable radviewer. Start a new locally running Work conversation, select RadViewer, and ask "Open RadViewer" or "Open D:/studies/case in RadViewer". You can also open it from the conversation side panel, enter an absolute path, and choose Scan. The panel entry requires client support for MCP Extensions; MCP Apps clients can also display the viewer from a tool call.
+
+To update an older installation, refresh the marketplace, reinstall the plugin in the Plugins Directory, and start a new conversation:
+
+```bash
+codex plugin marketplace upgrade radviewer
+```
+
+The package ships the compiled viewer and local server with no dependencies outside its folder. Automated tests cover isolated installation, UI resources, file chunks, and volume decoding with string compilation disabled. Rendering inside the Work client still needs verification.
+
+Distribution uses the GitHub plugin marketplace. This plugin has not been published to the OpenAI public directory.
 
 ## Local preview
 
@@ -81,6 +93,7 @@ Open http://localhost:5173 , enter an absolute path, and choose Scan. `npm run b
 ├── marketplace.json
 ├── .mcp.json
 ├── chatgpt/plugin.json                  ChatGPT Work desktop
+├── chatgpt/miniapp/                     Bundled runtime
 ├── chatgpt/mcp.json
 ├── .agents/plugins/marketplace.json
 ├── skills/radviewer/SKILL.md

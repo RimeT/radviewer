@@ -33,7 +33,7 @@ mask 与影像放在同一目录：`image` 配 `mask`，或 `名字` 配 `名字
 - `list_studies` 列出该目录和一层子目录里的检查。
 - `open_study` 打开一个文件，或打开文件夹里的第一套。
 
-RadViewer 页面在 MiniMax Code 的会话右侧，也在 Zcode 的会话侧栏。ChatGPT Work 桌面版调用同一个本地工具，并收到选中的路径。网页版 ChatGPT Work 跑不了这个本地进程。本机需要能运行 `node`。
+RadViewer 页面在 MiniMax Code 的会话右侧，也在 Zcode 的会话侧栏。ChatGPT Work 桌面版通过本地 MCP 在会话旁打开查看器。需要本地运行的会话，纯云端会话无法读取你电脑上的路径。本机需要能运行 `node`。
 
 ### MiniMax Code
 
@@ -59,7 +59,19 @@ Settings → Plugins → Create → Add marketplace，填 `RimeT/radviewer`。�
 codex plugin marketplace add RimeT/radviewer
 ```
 
-重启桌面端，在插件目录里选择 RadViewer 并安装。
+需要 ChatGPT 桌面版、本地执行环境，以及 PATH 中可用的 Node.js 20 或更高版本。上面的命令通过 GitHub 注册插件市场；不需要先克隆仓库或运行 npm install。
+
+重启桌面端，在插件目录的来源选择器中选择 RadViewer 市场，安装并启用 radviewer。新建本地运行的 Work 会话，选择 RadViewer，然后说「打开 RadViewer」，或「在 RadViewer 里打开 D:/studies/case」。也可以从会话侧面板入口打开查看器，输入绝对路径并点 Scan。面板入口是否显示取决于客户端对 MCP Extensions 的支持；支持 MCP Apps 的客户端也可通过工具调用显示查看器。
+
+已安装旧版本时，运行下面的命令更新市场，然后在插件目录重新安装插件，并新建会话：
+
+```bash
+codex plugin marketplace upgrade radviewer
+```
+
+插件包包含编译后的页面和本地服务，不依赖仓库外的文件。本地安装与协议测试覆盖独立启动、页面资源、文件分片和受限环境中的体积解码；Work 客户端中的实际面板渲染仍需验证。
+
+这是 GitHub 插件市场安装方式；尚未发布到 OpenAI 公共插件目录。
 
 ## 本地预览
 
@@ -81,6 +93,7 @@ npm run dev
 ├── marketplace.json
 ├── .mcp.json
 ├── chatgpt/plugin.json                  ChatGPT Work 桌面版
+├── chatgpt/miniapp/                     随包发布的运行文件
 ├── chatgpt/mcp.json
 ├── .agents/plugins/marketplace.json
 ├── skills/radviewer/SKILL.md

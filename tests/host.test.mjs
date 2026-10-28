@@ -74,11 +74,11 @@ test('mcp initialize, tools, and notifications', async () => {
   assert.equal(init.result.protocolVersion, '2025-03-26');
   assert.equal(init.result.serverInfo.name, 'radviewer');
   const tools = await dispatchMessage({ jsonrpc: '2.0', id: 2, method: 'tools/list' }, async () => '');
-  assert.deepEqual(tools.result.tools.map((tool) => tool.name), ['list_studies', 'open_study', 'list_directory', 'read_file', 'viewer_state']);
+  assert.deepEqual(tools.result.tools.map((tool) => tool.name), ['list_studies', 'open_study', 'list_directory', 'read_file', 'viewer_state', 'show_viewer', 'read_file_chunk']);
   assert.equal(tools.result.tools[1]._meta.ui.resourceUri, 'ui://radviewer/viewer.html');
   assert.equal(tools.result.tools[1]._meta.ui.surface, 'radviewer');
   assert.equal(init.result.capabilities.resources.listChanged, false);
-  assert.equal(init.result.serverInfo.version, '0.1.1');
+  assert.equal(init.result.serverInfo.version, '0.1.2');
   const note = await dispatchMessage({ jsonrpc: '2.0', method: 'notifications/initialized' }, async () => '');
   assert.equal(note, null);
   const called = await dispatchMessage({

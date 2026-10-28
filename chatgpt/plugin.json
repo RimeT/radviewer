@@ -1,10 +1,23 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "radviewer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "View DICOM, NIfTI, and NRRD studies, with a paired mask.",
   "author": { "name": "Rime" },
   "repository": "https://github.com/RimeT/radviewer",
   "license": "MIT",
-  "keywords": ["dicom", "nifti", "nrrd", "radiology"]
+  "keywords": ["dicom", "nifti", "nrrd", "radiology"],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "interface": {
+        "displayName": "RadViewer",
+        "shortDescription": "Local DICOM, NIfTI and NRRD viewer",
+        "developerName": "Rime",
+        "category": "Productivity",
+        "composerIcon": "./icon.png",
+        "logo": "./icon.png"
+      }
+    }
+  }
 }

@@ -60,7 +60,16 @@ export async function callViewerTool(name, args) {
       structured: { id, size: file.size, chunkBytes: FILE_CHUNK_BYTES, chunks },
     };
   }
-  if (name === 'viewer_state') {
+  if (name === 'read_file_chunk') {
+    if (!/^[0-9a-f]{16}$/.test(args?.id ?? '') || !Number.isSafeInteger(args?.index) || args.index < 0) {
+      throw new Error('Invalid file chunk.');
+    }
+    const resource = await readPluginResource(
+      'ui://radviewer/file/' + args.id + '/' + args.index,
+    );
+    return { text: '', meta: { blob: resource.contents[0].blob } };
+  }
+  if (name === 'viewer_state' || name === 'show_viewer') {
     const state = openState ?? { id: 0, path: '' };
     return { text: state.path || '', structured: state };
   }

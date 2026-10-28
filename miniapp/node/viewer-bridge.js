@@ -69,7 +69,7 @@
   }
 
   var ready = request('ui/initialize', {
-    appInfo: { name: 'radviewer', version: '0.1.1' },
+    appInfo: { name: 'radviewer', version: '0.1.2' },
     appCapabilities: {},
     protocolVersion: PROTOCOL,
   }, 15000).then(function () {
@@ -122,8 +122,10 @@
           (function (chunkIndex) {
             chain = chain.then(function () {
               if (signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
-              return request('resources/read', { uri: 'ui://radviewer/file/' + meta.id + '/' + chunkIndex }).then(function (read) {
-                var blob = read.contents && read.contents[0] && read.contents[0].blob;
+              return request('tools/call', { name: 'read_file_chunk', arguments: { id: meta.id, index: chunkIndex } }).then(function (read) {
+                if (read && read.isError) throw new Error(textOf(read));
+                var blob = read && read._meta && read._meta.blob;
+                if (typeof blob !== 'string') throw new Error('RadViewer: missing file chunk.');
                 parts.push(decodeBase64(blob));
               });
             });

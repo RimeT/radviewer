@@ -3,7 +3,7 @@ import { mkdirSync } from 'node:fs';
 
 mkdirSync('dist', { recursive: true });
 await esbuild.build({
-  entryPoints: ['src/volume.worker.ts'],
+  entryPoints: ['src/volume.worker.entry.ts'],
   outfile: 'dist/volume.worker.js',
   bundle: true,
   format: 'iife',

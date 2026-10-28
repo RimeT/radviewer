@@ -69,7 +69,8 @@ check(portableMcp.$schema === 'https://agent-plugins.org/schemas/1.0.0/mcp.schem
 check(portableMcp.mcpServers?.radviewer?.type === 'stdio', 'portable mcp transport');
 check(portableMcp.mcpServers?.radviewer?.command === 'node', 'portable mcp command');
 check(portableMcp.mcpServers?.radviewer?.args?.[0] === '${PLUGIN_ROOT}/stdio.mjs', 'portable mcp args');
-check(readFileSync('chatgpt/stdio.mjs', 'utf8').includes('../miniapp/node/stdio.mjs'), 'portable stdio entry');
+check(portable.extensions?.['com.openai']?.requires_local_executor === true, 'desktop execution required');
+check(readFileSync('chatgpt/stdio.mjs', 'utf8').includes('./miniapp/node/stdio.mjs'), 'portable stdio entry');
 check(readFileSync('chatgpt/skills/radviewer/SKILL.md', 'utf8') === readFileSync('skills/radviewer/SKILL.md', 'utf8'), 'chatgpt skill matches');
 check(statSync(path.join(root, 'plugin.json'), { throwIfNoEntry: false }) == null, 'root plugin.json would hide the Mini App');
 check(statSync(path.join(root, 'mcp.json'), { throwIfNoEntry: false }) == null, 'root mcp.json would hide the Mini App');
@@ -102,6 +103,10 @@ check(readFileSync('src/createWorker.ts', 'utf8').includes('__radviewerInlineWor
 check(readFileSync('miniapp/node/mcp.mjs', 'utf8').includes(`version: '${pkg.version}'`), 'mcp server version');
 check(readFileSync('miniapp/client/app.js', 'utf8').includes('__radviewerInlineWorker'), 'built worker fallback');
 
+for (const relative of ['node/stdio.mjs', 'node/mcp.mjs', 'node/tools.mjs', 'node/panel.mjs', 'node/viewer-bridge.js', 'node/files.mjs', 'node/catalog.mjs', 'node/open.mjs', 'node/server.mjs', 'client/app.js', 'client/app.css', 'client/index.html']) {
+  check(readFileSync('miniapp/' + relative).equals(readFileSync('chatgpt/miniapp/' + relative)), 'stale ChatGPT runtime: ' + relative);
+}
+check(readFileSync('LICENSE').equals(readFileSync('chatgpt/LICENSE')), 'ChatGPT license');
 const icon = readFileSync('icon.png');
 check(icon.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])), 'icon.png signature');
 

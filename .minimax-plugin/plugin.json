@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "radviewer",
   "displayName": "RadViewer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "View DICOM, NIfTI, and NRRD studies on axial, sagittal, and coronal slices and in 3D, with a paired mask.",
   "author": "Rime",
   "icon": "icon.png",
