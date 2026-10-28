@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "name": "radviewer",
+  "displayName": "MedView",
+  "version": "0.1.0",
+  "description": "View DICOM, NIfTI, and NRRD studies on axial, sagittal, and coronal slices and in 3D, with a paired mask.",
+  "author": "Rime",
+  "icon": "icon.png",
+  "category": "Science & Healthcare",
+  "exampleQueries": [
+    "Open this DICOM folder in RadViewer",
+    "Show the NIfTI volume and its paired mask",
+    "在 RadViewer 里打开这份 NRRD"
+  ],
+  "apps": [],
+  "mcpServers": ["radviewer.mcp.json"],
+  "skills": ["skills/radviewer/SKILL.md"]
+}

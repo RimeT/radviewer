@@ -1,0 +1,31 @@
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+  --dsw-alias-bg-primary: #10141c;
+  --dsw-alias-bg-secondary: #171c27;
+  --dsw-alias-label-primary: #e7eef8;
+  --dsw-alias-label-secondary: #a9b6c9;
+  --dsw-alias-label-tertiary: #7f8da3;
+  --dsw-alias-border-l1: rgba(255, 255, 255, 0.08);
+  --dsw-alias-border-l2: rgba(255, 255, 255, 0.14);
+  --dsw-alias-button-secondary-fill: rgba(255, 255, 255, 0.04);
+  --dsw-alias-state-business-primary: #3d9eff;
+  --dsw-radius-sm: 8px;
+  --dsw-radius-md: 12px;
+  --dsw-focus-ring-width: 2px;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --dsw-alias-bg-primary: #f4f7fb;
+  --dsw-alias-bg-secondary: #ffffff;
+  --dsw-alias-label-primary: #172033;
+  --dsw-alias-label-secondary: #4d5b73;
+  --dsw-alias-label-tertiary: #6d7b90;
+  --dsw-alias-border-l1: rgba(16, 24, 40, 0.08);
+  --dsw-alias-border-l2: rgba(16, 24, 40, 0.14);
+  --dsw-alias-button-secondary-fill: rgba(16, 24, 40, 0.04);
+  --dsw-alias-state-business-primary: #1d6fe0;
+}
+
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--dsw-alias-bg-primary); }

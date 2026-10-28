@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "artifacts": {
+    "client": ["./miniapp/client"],
+    "node": ["./miniapp/node"]
+  },
+  "runtime": {
+    "kind": "process",
+    "entry": "./miniapp/node/server.mjs",
+    "lifecycle": "on-demand"
+  },
+  "surface": {
+    "path": "/radviewer",
+    "window": {
+      "width": 1200,
+      "height": 800,
+      "minWidth": 720,
+      "minHeight": 520,
+      "resizable": true
+    }
+  },
+  "mcpEndpoints": [
+    { "server": "radviewer", "path": "/mcp/radviewer" }
+  ]
+}

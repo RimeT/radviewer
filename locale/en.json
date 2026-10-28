@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "MedView",
+    "description": "Interactive DICOM, NIfTI, and NRRD viewing, with a paired mask on the slices and each ROI class in the 3D view."
+  },
+  "tab.title": "MedView",
+  "guide.title": "MedView",
+  "guide.description": "Open a 3D medical volume",
+  "library.title": "Studies",
+  "library.path": "Folder",
+  "library.placeholder": "D:/studies/case",
+  "library.needPath": "Enter an absolute folder path, then scan.",
+  "library.refresh": "Scan",
+  "library.empty": "No DICOM series, NIfTI, or NRRD volumes in this folder.",
+  "library.slices": "{count} slices",
+  "library.mask": "Mask",
+  "loading": "Reading volume",
+  "error.title": "Could not open this study",
+  "views.axial": "Axial",
+  "views.sagittal": "Sagittal",
+  "views.coronal": "Coronal",
+  "views.volume": "3D",
+  "preset.soft": "Soft",
+  "preset.lung": "Lung",
+  "preset.bone": "Bone",
+  "preset.native": "Native",
+  "window": "W {width}  L {center}",
+  "slice": "{index} / {count}",
+  "opacity": "Opacity",
+  "class": "Class {id}",
+  "reset": "Reset",
+  "value": "Value {value}"
+}

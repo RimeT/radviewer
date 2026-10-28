@@ -1,0 +1,12 @@
+{
+  "name": "radviewer",
+  "interface": { "displayName": "RadViewer" },
+  "plugins": [
+    {
+      "name": "radviewer",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}

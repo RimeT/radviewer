@@ -1,0 +1,32 @@
+{
+  "name": "radviewer",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "View DICOM, NIfTI, and NRRD studies on orthogonal slices and in 3D, with a paired mask.",
+  "author": "Rime",
+  "repository": "https://github.com/RimeT/radviewer",
+  "type": "module",
+  "mcode": {
+    "schemaVersion": 2,
+    "miniApp": "./miniapp/miniapp.json"
+  },
+  "scripts": {
+    "build:worker": "node scripts/build-worker.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check-package.mjs && node --test tests/host.test.mjs && node scripts/selfcheck.mjs",
+    "dev": "node scripts/build-worker.mjs && vite",
+    "icon": "node scripts/write-icon.mjs"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "esbuild": "^0.25.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.170.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
+}

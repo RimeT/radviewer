@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "mcpServers": {
+    "radviewer": {
+      "type": "streamable-http",
+      "url": "http://127.0.0.1:9/mcp/radviewer",
+      "headers": {},
+      "description": "Open a DICOM, NIfTI, or NRRD study in the RadViewer page.",
+      "timeout": 60000
+    }
+  }
+}

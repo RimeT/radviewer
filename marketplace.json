@@ -1,0 +1,11 @@
+{
+  "name": "radviewer",
+  "plugins": [
+    {
+      "name": "radviewer",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "DICOM, NIfTI, and NRRD"
+    }
+  ]
+}

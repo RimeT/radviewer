@@ -1,0 +1,90 @@
+# RadViewer
+
+[中文](README.md)
+
+Open DICOM, NIfTI, and NRRD on this machine. Axial, sagittal, coronal, and 3D share one page, and a paired mask is colored by class. The app reads only the absolute path you give it.
+
+## The page
+
+Enter an absolute folder path and choose Scan. The list includes studies in that folder and one level of subfolders. A card marked Mask has a paired label.
+
+A study opens as three planes plus 3D. The crosshair follows the current slice, and the corner letters are LPS directions. CT studies offer Soft, Lung, Bone, and Native. Dragging on a slice also changes the window. The readout is window width, window level, and the value under the crosshair.
+
+Put the mask beside the image: `image` with `mask`, or `name` with `name-label`, same directory and same format family. Class 0 stays hidden. The other classes can be toggled, and Opacity changes how strong they are.
+
+The slider under a plane changes the slice. Drag with the left button to window, the middle button to pan, and the right button to zoom. Click to move the crosshair. Drag in the 3D cell to rotate, and use the wheel to zoom. Reset restores the view. Studies returns to the list.
+
+## Example
+
+![cas045: axial, sagittal, coronal, and 3D vessels](docs/cas045.png)
+
+The figure shows training case cas045 from the MICCAI 2023 Cerebral Artery Segmentation Challenge (CAS 2023). The task is segmentation of cerebral arteries on 3D TOF-MRA in patients with symptomatic intracranial artery stenosis.
+
+> Huijun Chen, Xihai Zhao, Haozhong Sun, Jiaqi Dou, Chenlin Du, Runyu Yang, Xiaoqi Lin, Shuwan Yu, Jiachen Liu, Chun Yuan, Niranjan Balu. Cerebral artery segmentation Challenge, MICCAI 2023. Zenodo. [https://doi.org/10.5281/zenodo.7839969](https://doi.org/10.5281/zenodo.7839969)
+
+- Data record: [10.5281/zenodo.7839970](https://doi.org/10.5281/zenodo.7839970)
+- Challenge: [Codalab](https://codalab.lisn.upsaclay.fr/competitions/9804)
+- Overview: [SMRA CAS 2023](https://society4mra.org/cerebral-artery-segmentation-challenge-cas2023/)
+
+## Use
+
+Give the assistant an absolute path, such as `D:/studies/case`.
+
+- `list_studies` lists the studies in that directory and one level of subfolders.
+- `open_study` opens one file, or the first study in a folder.
+
+The 3D page runs in MiniMax Code, where it is shown as MedView. Zcode and ChatGPT Work desktop use the same local tool and receive the selected path. ChatGPT Work on the web cannot run that local process. `node` has to be available.
+
+### MiniMax Code
+
+The repository root contains `.minimax-plugin/plugin.json`. For a GitHub install in the desktop app, use:
+
+https://github.com/RimeT/radviewer
+
+You can also copy the repository into the local plugin directory and restart. `.minimax-plugin` has to sit directly inside that directory.
+
+```text
+%USERPROFILE%\.minimax\plugins\radviewer
+```
+
+On macOS and Linux the path is `~/.minimax/plugins/radviewer`. Open MedView, or ask the assistant to open `D:/studies/case` in MedView.
+
+### Zcode
+
+Settings → Plugins → Create → Add marketplace, and enter `RimeT/radviewer`. Install radviewer from Personal and enable it.
+
+### ChatGPT Work desktop
+
+```bash
+codex plugin marketplace add RimeT/radviewer
+```
+
+Restart the desktop app, then choose RadViewer in the plugin directory and install it.
+
+## Local preview
+
+```bash
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 , enter an absolute path, and choose Scan. `npm run build` refreshes the page shipped with the package.
+
+## Layout
+
+```text
+.
+├── .minimax-plugin/plugin.json          MiniMax Code
+├── radviewer.mcp.json
+├── miniapp/
+├── .zcode-plugin/plugin.json            Zcode
+├── marketplace.json
+├── .mcp.json
+├── plugin.json                          ChatGPT Work desktop
+├── mcp.json
+├── .agents/plugins/marketplace.json
+├── skills/radviewer/SKILL.md
+└── docs/
+```
+
+MIT. The 3D view uses three.js, also MIT.

@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "医学三维",
+    "description": "交互查看 DICOM、NIfTI 与 NRRD。切面可叠加配对 mask，三维视窗按类别显示 ROI。"
+  },
+  "tab.title": "医学三维",
+  "guide.title": "医学三维",
+  "guide.description": "打开三维医学体数据",
+  "library.path": "文件夹",
+  "library.placeholder": "D:/studies/case",
+  "library.needPath": "填写本机绝对路径，然后扫描。",
+  "library.refresh": "扫描",
+  "library.empty": "这个文件夹里没有 DICOM 序列、NIfTI 或 NRRD 体数据。",
+  "library.title": "检查",
+  "library.slices": "{count} 层",
+  "library.mask": "Mask",
+  "loading": "正在读取体数据",
+  "error.title": "无法打开这个检查",
+  "views.axial": "轴位",
+  "views.sagittal": "矢状位",
+  "views.coronal": "冠状位",
+  "views.volume": "三维",
+  "preset.soft": "软组织",
+  "preset.lung": "肺",
+  "preset.bone": "骨",
+  "preset.native": "原始",
+  "window": "W {width}  L {center}",
+  "slice": "{index} / {count}",
+  "opacity": "透明度",
+  "class": "类别 {id}",
+  "reset": "重置",
+  "value": "值 {value}"
+}
