@@ -5,11 +5,12 @@ import { createServer as createNetServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { studiesFromListing } from '../miniapp/node/catalog.mjs';
+import { pairSiblingMasks, studiesFromListing } from '../miniapp/node/catalog.mjs';
 import { assertAbsolute, listDirectory } from '../miniapp/node/files.mjs';
 import { dispatchMessage } from '../miniapp/node/mcp.mjs';
 import { listStudies, resolveOpen } from '../miniapp/node/open.mjs';
 import { start } from '../miniapp/node/server.mjs';
+import { callViewerTool, readPluginResource } from '../miniapp/node/tools.mjs';
 
 test('pairs image and mask and skips the label as its own study', () => {
   const studies = studiesFromListing('D:/case', [
@@ -20,6 +21,23 @@ test('pairs image and mask and skips the label as its own study', () => {
   assert.equal(studies.length, 1);
   assert.equal(studies[0].kind, 'nifti');
   assert.equal(studies[0].maskPath, 'D:/case/mask.nii.gz');
+});
+
+test('pairs data and mask volumes in sibling folders', () => {
+  const paired = pairSiblingMasks([
+    { id: 'D:/case/data/045.nii.gz', title: '045', kind: 'nifti', imagePaths: ['D:/case/data/045.nii.gz'] },
+    { id: 'D:/case/mask/045.nii.gz', title: '045', kind: 'nifti', imagePaths: ['D:/case/mask/045.nii.gz'] },
+    {
+      id: 'D:/case/view/045_image.nii.gz',
+      title: '045_image',
+      kind: 'nifti',
+      imagePaths: ['D:/case/view/045_image.nii.gz'],
+      maskPath: 'D:/case/view/045_image-label.nii.gz',
+    },
+  ]);
+  assert.equal(paired.length, 2);
+  assert.equal(paired[0].maskPath, 'D:/case/mask/045.nii.gz');
+  assert.equal(paired[1].title, '045_image');
 });
 
 test('rejects a relative path', () => {
@@ -56,7 +74,11 @@ test('mcp initialize, tools, and notifications', async () => {
   assert.equal(init.result.protocolVersion, '2025-03-26');
   assert.equal(init.result.serverInfo.name, 'radviewer');
   const tools = await dispatchMessage({ jsonrpc: '2.0', id: 2, method: 'tools/list' }, async () => '');
-  assert.deepEqual(tools.result.tools.map((tool) => tool.name), ['list_studies', 'open_study']);
+  assert.deepEqual(tools.result.tools.map((tool) => tool.name), ['list_studies', 'open_study', 'list_directory', 'read_file', 'viewer_state']);
+  assert.equal(tools.result.tools[1]._meta.ui.resourceUri, 'ui://radviewer/viewer.html');
+  assert.equal(tools.result.tools[1]._meta.ui.surface, 'radviewer');
+  assert.equal(init.result.capabilities.resources.listChanged, false);
+  assert.equal(init.result.serverInfo.version, '0.1.1');
   const note = await dispatchMessage({ jsonrpc: '2.0', method: 'notifications/initialized' }, async () => '');
   assert.equal(note, null);
   const called = await dispatchMessage({
@@ -65,7 +87,7 @@ test('mcp initialize, tools, and notifications', async () => {
     method: 'tools/call',
     params: { name: 'open_study', arguments: { path: 'relative' } },
   }, async () => {
-    throw new Error('MedView 需要本机绝对路径');
+    throw new Error('RadViewer 需要本机绝对路径');
   });
   assert.equal(called.result.isError, true);
   assert.match(called.result.content[0].text, /绝对路径/);
@@ -163,6 +185,45 @@ test('stdio initialize and open_study', async () => {
     assert.match(lines[1].result.content[0].text, /image\.nii\.gz/);
   } finally {
     child.kill();
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('viewer resource and file chunks', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'radviewer-chunk-'));
+  const payload = Buffer.from('nifti-bytes');
+  try {
+    await writeFile(path.join(dir, 'image.nii.gz'), payload);
+    const listed = await dispatchMessage({ jsonrpc: '2.0', id: 1, method: 'resources/list' }, async () => '');
+    assert.equal(listed.result.resources[0].uri, 'ui://radviewer/viewer.html');
+    assert.equal(listed.result.resources[0].mimeType, 'text/html;profile=mcp-app');
+    const page = await dispatchMessage({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'resources/read',
+      params: { uri: 'ui://radviewer/viewer.html' },
+    }, async () => '', { readResource: readPluginResource });
+    assert.equal(page.result.contents[0].mimeType, 'text/html;profile=mcp-app');
+    assert.match(page.result.contents[0].text, /__radviewerInlineWorker/);
+    assert.match(page.result.contents[0].text, /type="module"/);
+    const opened = await dispatchMessage({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: { name: 'read_file', arguments: { path: path.join(dir, 'image.nii.gz') } },
+    }, callViewerTool, { readResource: readPluginResource });
+    assert.equal(opened.result.isError, false);
+    const meta = opened.result.structuredContent;
+    assert.equal(meta.size, payload.length);
+    assert.equal(meta.chunks, 1);
+    const chunk = await dispatchMessage({
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'resources/read',
+      params: { uri: `ui://radviewer/file/${meta.id}/0` },
+    }, async () => '', { readResource: readPluginResource });
+    assert.equal(Buffer.from(chunk.result.contents[0].blob, 'base64').equals(payload), true);
+  } finally {
     await rm(dir, { recursive: true, force: true });
   }
 });

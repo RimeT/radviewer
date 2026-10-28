@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "radviewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "View DICOM, NIfTI, and NRRD studies, with a paired mask.",
   "author": { "name": "Rime" },
   "repository": "https://github.com/RimeT/radviewer",

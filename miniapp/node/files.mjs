@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { readdir, stat } from 'node:fs/promises';
+import { open, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 const MAX_BYTES = 2 * 1024 * 1024 * 1024;
@@ -52,15 +52,31 @@ export async function listDirectory(input) {
   };
 }
 
-export async function openReadStream(input) {
+async function fileInfo(input) {
   const resolved = assertAbsolute(input);
   const info = await statPath(resolved);
   if (!info.isFile()) fail('not_file', `RadViewer：${displayPath(resolved)} 不是文件。`);
   if (info.size > MAX_BYTES) fail('too_large', `RadViewer：${displayPath(resolved)} 超过 2 GiB。`);
-  return {
-    path: displayPath(resolved),
-    resolved,
-    size: info.size,
-    stream: createReadStream(resolved),
-  };
+  return { path: displayPath(resolved), resolved, size: info.size };
+}
+
+export async function describeFile(input) {
+  return fileInfo(input);
+}
+
+export async function readFileSlice(resolved, offset, length) {
+  if (length <= 0) return Buffer.alloc(0);
+  const handle = await open(resolved, 'r');
+  try {
+    const buffer = Buffer.alloc(length);
+    const { bytesRead } = await handle.read(buffer, 0, length, offset);
+    return buffer.subarray(0, bytesRead);
+  } finally {
+    await handle.close();
+  }
+}
+
+export async function openReadStream(input) {
+  const file = await fileInfo(input);
+  return { ...file, stream: createReadStream(file.resolved) };
 }

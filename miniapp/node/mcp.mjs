@@ -1,9 +1,16 @@
+import { HTML_MIME, UI_META, VIEWER_URI } from './panel.mjs';
+
 const PROTOCOL_VERSIONS = new Set(['2024-11-05', '2025-03-26', '2025-06-18']);
+const SURFACE = {
+  resourceUri: VIEWER_URI,
+  surface: 'radviewer',
+  visibility: ['model', 'app'],
+};
 
 export const TOOLS = [
   {
     name: 'list_studies',
-    description: 'List DICOM series, NIfTI volumes, and NRRD files in an absolute directory, including one level of subfolders. Paired masks are not listed as their own study.',
+    description: 'List DICOM series, NIfTI volumes, and NRRD files in an absolute directory, including one level of subfolders. Paired masks are not listed as their own study. MiniMax Code and Zcode also open the RadViewer page on that folder.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -15,10 +22,11 @@ export const TOOLS = [
       },
       required: ['path'],
     },
+    _meta: { ui: SURFACE },
   },
   {
     name: 'open_study',
-    description: 'Select a DICOM, NIfTI, or NRRD study. In MiniMax Code this opens the RadViewer page. path is an absolute file or directory. Do not decode the pixels.',
+    description: 'Select a DICOM, NIfTI, or NRRD study and show it in the RadViewer page. path is an absolute file or directory. Do not decode the pixels.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -30,6 +38,39 @@ export const TOOLS = [
       },
       required: ['path'],
     },
+    _meta: { ui: SURFACE },
+  },
+  {
+    name: 'list_directory',
+    description: 'Viewer page only. List one absolute directory for the RadViewer page. Do not use this instead of list_studies.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', description: 'Absolute directory path on this machine.' },
+      },
+      required: ['path'],
+    },
+    _meta: { ui: { visibility: ['app'] } },
+  },
+  {
+    name: 'read_file',
+    description: 'Viewer page only. Open an absolute file so the RadViewer page can read it in chunks. Do not decode the pixels.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string', description: 'Absolute file path on this machine.' },
+      },
+      required: ['path'],
+    },
+    _meta: { ui: { visibility: ['app'] } },
+  },
+  {
+    name: 'viewer_state',
+    description: 'Viewer page only. Return the study path most recently selected for the RadViewer page.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: {} },
+    _meta: { ui: { visibility: ['app'] } },
   },
 ];
 
@@ -41,7 +82,19 @@ function failure(id, code, message) {
   return { jsonrpc: '2.0', id, error: { code, message } };
 }
 
-export async function dispatchMessage(message, callTool) {
+function toolResult(outcome) {
+  if (typeof outcome === 'string' || outcome == null) {
+    return { content: [{ type: 'text', text: String(outcome ?? '') }], isError: false };
+  }
+  const result = {
+    content: [{ type: 'text', text: String(outcome.text ?? '') }],
+    isError: false,
+  };
+  if (outcome.structured) result.structuredContent = outcome.structured;
+  return result;
+}
+
+export async function dispatchMessage(message, callTool, options = {}) {
   if (!message || message.jsonrpc !== '2.0' || typeof message.method !== 'string') {
     return failure(message && 'id' in message ? message.id : null, -32600, 'Invalid Request');
   }
@@ -53,20 +106,54 @@ export async function dispatchMessage(message, callTool) {
     const protocolVersion = PROTOCOL_VERSIONS.has(requested) ? requested : '2025-03-26';
     return reply(id, {
       protocolVersion,
-      capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: 'radviewer', version: '0.1.0' },
+      capabilities: {
+        tools: { listChanged: false },
+        resources: { listChanged: false },
+      },
+      serverInfo: { name: 'radviewer', version: '0.1.1' },
     });
   }
   if (message.method === 'ping') return reply(id, {});
   if (message.method === 'tools/list') return reply(id, { tools: TOOLS });
+  if (message.method === 'resources/list') {
+    return reply(id, {
+      resources: [{
+        uri: VIEWER_URI,
+        name: 'viewer',
+        mimeType: HTML_MIME,
+        _meta: UI_META,
+      }],
+    });
+  }
+  if (message.method === 'resources/templates/list') {
+    return reply(id, {
+      resourceTemplates: [{
+        uriTemplate: 'ui://radviewer/file/{id}/{index}',
+        name: 'file',
+        mimeType: 'application/octet-stream',
+      }],
+    });
+  }
+  if (message.method === 'resources/subscribe' || message.method === 'resources/unsubscribe') {
+    return reply(id, {});
+  }
+  if (message.method === 'resources/read') {
+    const uri = message.params && message.params.uri;
+    if (typeof uri !== 'string' || !options.readResource) return failure(id, -32602, 'uri is required');
+    try {
+      return reply(id, await options.readResource(uri));
+    } catch (error) {
+      const text = error instanceof Error ? error.message : String(error);
+      return failure(id, -32002, text);
+    }
+  }
   if (message.method === 'tools/call') {
     const name = message.params && message.params.name;
     const args = message.params && message.params.arguments && typeof message.params.arguments === 'object'
       ? message.params.arguments
       : {};
     try {
-      const text = await callTool(name, args);
-      return reply(id, { content: [{ type: 'text', text: String(text) }], isError: false });
+      return reply(id, toolResult(await callTool(name, args)));
     } catch (error) {
       const text = error instanceof Error ? error.message : String(error);
       return reply(id, { content: [{ type: 'text', text }], isError: true });
@@ -102,7 +189,7 @@ function readBody(request) {
   });
 }
 
-export async function handleMcpHttp(request, response, callTool) {
+export async function handleMcpHttp(request, response, callTool, options = {}) {
   if (request.method === 'GET') {
     response.writeHead(200, {
       'content-type': 'text/event-stream; charset=utf-8',
@@ -143,7 +230,7 @@ export async function handleMcpHttp(request, response, callTool) {
   if (Array.isArray(message)) {
     const replies = [];
     for (const item of message) {
-      const result = await dispatchMessage(item, callTool);
+      const result = await dispatchMessage(item, callTool, options);
       if (result) replies.push(result);
     }
     if (replies.length === 0) {
@@ -154,7 +241,7 @@ export async function handleMcpHttp(request, response, callTool) {
     sendJson(response, 200, replies);
     return;
   }
-  const result = await dispatchMessage(message, callTool);
+  const result = await dispatchMessage(message, callTool, options);
   if (!result) {
     response.writeHead(202);
     response.end();

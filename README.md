@@ -10,7 +10,7 @@
 
 打开后是三平面和三维。十字线跟着当前层走，角上的字母是 LPS 方向。CT 有 Soft、Lung、Bone、Native，也可以在切面上拖动调窗。读数是窗宽、窗位和十字线处的像素值。
 
-mask 与影像放在同一目录：`image` 配 `mask`，或 `名字` 配 `名字-label`，两边要是同一类格式。Class 0 不显示。其余类别可以单独开关，Opacity 调透明度。
+mask 与影像放在同一目录：`image` 配 `mask`，或 `名字` 配 `名字-label`，两边要是同一类格式。同一层的 `data` 和 `mask` 文件夹里，同名体积也会配成一套。Class 0 不显示。其余类别可以单独开关，Opacity 调透明度。
 
 切面下方的滑条用来换层。左键拖动调窗，中键平移，右键缩放，单击移动十字线。在三维格里拖动可以旋转，滚轮缩放。Reset 回到初始视角。Studies 回到列表。
 
@@ -33,7 +33,7 @@ mask 与影像放在同一目录：`image` 配 `mask`，或 `名字` 配 `名字
 - `list_studies` 列出该目录和一层子目录里的检查。
 - `open_study` 打开一个文件，或打开文件夹里的第一套。
 
-三维页面只在 MiniMax Code 里，安装后的名字是 MedView。Zcode 和 ChatGPT Work 桌面版使用同一个本地工具，返回选中的路径。网页版 ChatGPT Work 跑不了这个本地进程。本机需要能运行 `node`。
+RadViewer 页面在 MiniMax Code 的会话右侧，也在 Zcode 的会话侧栏。ChatGPT Work 桌面版调用同一个本地工具，并收到选中的路径。网页版 ChatGPT Work 跑不了这个本地进程。本机需要能运行 `node`。
 
 ### MiniMax Code
 
@@ -41,17 +41,17 @@ mask 与影像放在同一目录：`image` 配 `mask`，或 `名字` 配 `名字
 
 https://github.com/RimeT/radviewer
 
-也可以把仓库放到本机插件目录后重启。这一层要能直接看到 `.minimax-plugin`。
+也可以把仓库放到本机插件目录后重启。这一层要能直接看到 `.minimax-plugin`。启用后，从会话右侧的面板打开 RadViewer。
 
 ```text
 %USERPROFILE%\.minimax\plugins\radviewer
 ```
 
-macOS 和 Linux 是 `~/.minimax/plugins/radviewer`。打开 MedView，或对助手说「在 MedView 里打开 D:/studies/case」。
+macOS 和 Linux 是 `~/.minimax/plugins/radviewer`。打开 RadViewer，或对助手说「在 RadViewer 里打开 D:/studies/case」。
 
 ### Zcode
 
-Settings → Plugins → Create → Add marketplace，填 `RimeT/radviewer`。在 Personal 里安装 radviewer 并启用。
+Settings → Plugins → Create → Add marketplace，填 `RimeT/radviewer`。在 Personal 里安装 radviewer 并启用。会话侧栏里会出现 RadViewer。可以在页面里填绝对路径并点 Scan，也可以让助手打开一个路径。
 
 ### ChatGPT Work 桌面版
 
@@ -77,11 +77,11 @@ npm run dev
 ├── .minimax-plugin/plugin.json          MiniMax Code
 ├── radviewer.mcp.json
 ├── miniapp/
-├── .zcode-plugin/plugin.json            Zcode
+├── .zcode-plugin/plugin.json            Zcode 会话侧栏
 ├── marketplace.json
 ├── .mcp.json
-├── plugin.json                          ChatGPT Work 桌面版
-├── mcp.json
+├── chatgpt/plugin.json                  ChatGPT Work 桌面版
+├── chatgpt/mcp.json
 ├── .agents/plugins/marketplace.json
 ├── skills/radviewer/SKILL.md
 └── docs/

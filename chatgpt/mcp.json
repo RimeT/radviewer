@@ -4,7 +4,7 @@
     "radviewer": {
       "type": "stdio",
       "command": "node",
-      "args": ["${PLUGIN_ROOT}/miniapp/node/stdio.mjs"]
+      "args": ["${PLUGIN_ROOT}/stdio.mjs"]
     }
   }
 }

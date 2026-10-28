@@ -10,7 +10,7 @@ Enter an absolute folder path and choose Scan. The list includes studies in that
 
 A study opens as three planes plus 3D. The crosshair follows the current slice, and the corner letters are LPS directions. CT studies offer Soft, Lung, Bone, and Native. Dragging on a slice also changes the window. The readout is window width, window level, and the value under the crosshair.
 
-Put the mask beside the image: `image` with `mask`, or `name` with `name-label`, same directory and same format family. Class 0 stays hidden. The other classes can be toggled, and Opacity changes how strong they are.
+Put the mask beside the image: `image` with `mask`, or `name` with `name-label`, same directory and same format family. A `data` folder and a sibling `mask` folder with the same filename are paired too. Class 0 stays hidden. The other classes can be toggled, and Opacity changes how strong they are.
 
 The slider under a plane changes the slice. Drag with the left button to window, the middle button to pan, and the right button to zoom. Click to move the crosshair. Drag in the 3D cell to rotate, and use the wheel to zoom. Reset restores the view. Studies returns to the list.
 
@@ -33,7 +33,7 @@ Give the assistant an absolute path, such as `D:/studies/case`.
 - `list_studies` lists the studies in that directory and one level of subfolders.
 - `open_study` opens one file, or the first study in a folder.
 
-The 3D page runs in MiniMax Code, where it is shown as MedView. Zcode and ChatGPT Work desktop use the same local tool and receive the selected path. ChatGPT Work on the web cannot run that local process. `node` has to be available.
+The RadViewer page opens on the right in MiniMax Code and in the Zcode session sidebar. ChatGPT Work desktop calls the same local tool and receives the selected path. ChatGPT Work on the web cannot run that local process. `node` has to be available.
 
 ### MiniMax Code
 
@@ -41,17 +41,17 @@ The repository root contains `.minimax-plugin/plugin.json`. For a GitHub install
 
 https://github.com/RimeT/radviewer
 
-You can also copy the repository into the local plugin directory and restart. `.minimax-plugin` has to sit directly inside that directory.
+You can also copy the repository into the local plugin directory and restart. `.minimax-plugin` has to sit directly inside that directory. After it is enabled, open RadViewer from the panel on the right.
 
 ```text
 %USERPROFILE%\.minimax\plugins\radviewer
 ```
 
-On macOS and Linux the path is `~/.minimax/plugins/radviewer`. Open MedView, or ask the assistant to open `D:/studies/case` in MedView.
+On macOS and Linux the path is `~/.minimax/plugins/radviewer`. Open RadViewer, or ask the assistant to open `D:/studies/case` in RadViewer.
 
 ### Zcode
 
-Settings → Plugins → Create → Add marketplace, and enter `RimeT/radviewer`. Install radviewer from Personal and enable it.
+Settings → Plugins → Create → Add marketplace, and enter `RimeT/radviewer`. Install radviewer from Personal and enable it. RadViewer appears in the session sidebar. Enter an absolute path and choose Scan, or ask the assistant to open a path.
 
 ### ChatGPT Work desktop
 
@@ -77,11 +77,11 @@ Open http://localhost:5173 , enter an absolute path, and choose Scan. `npm run b
 ├── .minimax-plugin/plugin.json          MiniMax Code
 ├── radviewer.mcp.json
 ├── miniapp/
-├── .zcode-plugin/plugin.json            Zcode
+├── .zcode-plugin/plugin.json            Zcode session sidebar
 ├── marketplace.json
 ├── .mcp.json
-├── plugin.json                          ChatGPT Work desktop
-├── mcp.json
+├── chatgpt/plugin.json                  ChatGPT Work desktop
+├── chatgpt/mcp.json
 ├── .agents/plugins/marketplace.json
 ├── skills/radviewer/SKILL.md
 └── docs/

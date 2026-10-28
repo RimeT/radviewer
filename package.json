@@ -1,6 +1,6 @@
 {
   "name": "radviewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "MIT",
   "description": "View DICOM, NIfTI, and NRRD studies on orthogonal slices and in 3D, with a paired mask.",

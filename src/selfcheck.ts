@@ -5,7 +5,7 @@ import { decodeNrrd, nrrdDataFiles } from './nrrd.ts';
 import { decodeDicom } from './dicom.ts';
 import { meshLabel } from './marchingCubes.ts';
 import { planesFromAxes } from './planes.ts';
-import { studiesFromListing } from './study.ts';
+import { pairSiblingMasks, studiesFromListing } from './study.ts';
 import type { Vec3 } from './types.ts';
 
 function loadMaybeGzip(path: string): Uint8Array {
@@ -65,6 +65,11 @@ const cas = studiesFromListing('samples/cas045', [
   { name: 'mask.nii.gz', type: 'file' },
 ]);
 assert(cas.length === 1 && cas[0]?.maskPath === 'samples/cas045/mask.nii.gz', 'image/mask pairing failed');
+const sibling = pairSiblingMasks([
+  { id: 'case/data/045.nii.gz', title: '045', kind: 'nifti', imagePaths: ['case/data/045.nii.gz'] },
+  { id: 'case/mask/045.nii.gz', title: '045', kind: 'nifti', imagePaths: ['case/mask/045.nii.gz'] },
+]);
+assert(sibling.length === 1 && sibling[0]?.maskPath === 'case/mask/045.nii.gz', 'data/mask sibling pairing failed');
 const dicomListing = studiesFromListing('samples/MonoE_40keV', [
   { name: 'Image0002.dcm', type: 'file' },
   { name: 'Image0001.dcm', type: 'file' },

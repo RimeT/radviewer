@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "医学三维",
+    "title": "RadViewer",
     "description": "交互查看 DICOM、NIfTI 与 NRRD。切面可叠加配对 mask，三维视窗按类别显示 ROI。"
   },
-  "tab.title": "医学三维",
-  "guide.title": "医学三维",
+  "tab.title": "RadViewer",
+  "guide.title": "RadViewer",
   "guide.description": "打开三维医学体数据",
   "library.path": "文件夹",
   "library.placeholder": "D:/studies/case",

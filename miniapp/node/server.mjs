@@ -4,7 +4,7 @@ import { createServer } from 'node:http';
 import path from 'node:path';
 import { listDirectory, openReadStream } from './files.mjs';
 import { handleMcpHttp } from './mcp.mjs';
-import { listStudies, resolveOpen } from './open.mjs';
+import { callViewerTool, readPluginResource } from './tools.mjs';
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -43,15 +43,12 @@ export async function start(context) {
   }
 
   async function callTool(name, args) {
-    const raw = args && typeof args.path === 'string' ? args.path : '';
-    if (name === 'list_studies') return (await listStudies(raw)).message;
-    if (name === 'open_study') {
-      const opened = await resolveOpen(raw);
-      publish(opened);
-      context.logger?.info?.('radviewer.open', { format: opened.format });
-      return opened.message;
+    const outcome = await callViewerTool(name, args);
+    if (outcome.opened) {
+      publish(outcome.opened);
+      context.logger?.info?.('radviewer.open', { format: outcome.opened.format });
     }
-    throw new Error(`Unknown tool ${name}`);
+    return outcome;
   }
 
   const server = createServer((request, response) => {
@@ -67,7 +64,7 @@ export async function start(context) {
   async function route(request, response) {
     const url = new URL(request.url ?? '/', 'http://miniapp.local');
     if (url.pathname === '/mcp/radviewer' || url.pathname === '/mcp/radviewer/') {
-      await handleMcpHttp(request, response, callTool);
+      await handleMcpHttp(request, response, callTool, { readResource: readPluginResource });
       return;
     }
     if (request.method === 'GET' && url.pathname === '/api/events') {

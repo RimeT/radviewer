@@ -62,3 +62,26 @@ export function studiesFromListing(dir, entries) {
   }
   return studies;
 }
+
+/** Pair `data/name` with `mask/name` in sibling folders, and hide the mask as its own study. */
+export function pairSiblingMasks(studies) {
+  const key = (value) => String(value).replace(/\\/g, '/');
+  const byImage = new Map();
+  for (const study of studies) {
+    const image = study.imagePaths && study.imagePaths[0];
+    if (image) byImage.set(key(image), study);
+  }
+  const hidden = new Set();
+  for (const study of studies) {
+    const image = study.imagePaths && study.imagePaths[0];
+    if (!image || study.maskPath || study.kind === 'dicom') continue;
+    const normalized = key(image);
+    const maskKey = normalized.replace(/\/data\/([^/]+)$/i, '/mask/$1');
+    if (maskKey === normalized) continue;
+    const maskStudy = byImage.get(maskKey);
+    if (!maskStudy || maskStudy === study || maskStudy.kind === 'dicom') continue;
+    study.maskPath = key(maskStudy.imagePaths[0]);
+    hidden.add(maskStudy);
+  }
+  return studies.filter((study) => !hidden.has(study));
+}

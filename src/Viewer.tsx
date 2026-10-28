@@ -5,7 +5,7 @@ import { createVolumeWorker } from './createWorker.ts';
 import { runWorker } from './runWorker.ts';
 import { MedStage, type CellRect, type ViewId, type ViewState } from './stage.ts';
 import { nrrdDataFiles, nrrdFileBytes } from './nrrd.ts';
-import { joinPath, parentPath, studiesFromListing, studyForPath, type DirEntry } from './study.ts';
+import { joinPath, parentPath, pairSiblingMasks, studiesFromListing, studyForPath, baseName, type DirEntry } from './study.ts';
 import { sampleValue } from './slice.ts';
 import type { PreparedStudy, StudySource } from './types.ts';
 import { CT_PRESETS } from './window.ts';
@@ -262,7 +262,7 @@ function Studio(props: ViewerProps & { address?: string; revision?: number; life
         if (!listing.ok || !listing.value) continue;
         found.push(...studiesFromListing(listing.value.path || child, listing.value.entries as DirEntry[]));
       }
-      setStudies(found);
+      setStudies(pairSiblingMasks(found));
     } catch (cause) {
       if (!isAbort(cause)) setError(cause instanceof Error ? cause.message : String(cause));
     } finally {
@@ -277,6 +277,16 @@ function Studio(props: ViewerProps & { address?: string; revision?: number; life
     if (!listing.ok || !listing.value) throw new Error(textOf(listing.error));
     const study = studyForPath(dir, listing.value.entries as DirEntry[], path);
     if (!study) throw new Error(path);
+    const normalizedDir = dir.replace(/\\/g, '/');
+    if (!study.maskPath && /\/data$/i.test(normalizedDir)) {
+      const maskDir = normalizedDir.replace(/\/data$/i, '/mask');
+      const maskList = await props.listDir(maskDir, signal);
+      const name = baseName(path);
+      const entries = maskList.ok ? maskList.value?.entries ?? [] : [];
+      if (entries.some((entry) => entry.type === 'file' && entry.name === name)) {
+        study.maskPath = joinPath(maskList.value?.path || maskDir, name);
+      }
+    }
     await openStudy(study, signal);
   }
 

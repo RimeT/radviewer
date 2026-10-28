@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { classifyName, joinPath, studiesFromListing } from './catalog.mjs';
+import { classifyName, joinPath, pairSiblingMasks, studiesFromListing } from './catalog.mjs';
 import { assertAbsolute, displayPath, listDirectory } from './files.mjs';
 import { stat } from 'node:fs/promises';
 
@@ -24,16 +24,17 @@ export async function listStudies(input) {
       /* an unreadable child does not hide the studies that did open */
     }
   }
-  const shown = found.slice(0, LIST_CAP).map((study, index) => {
+  const paired = pairSiblingMasks(found);
+  const shown = paired.slice(0, LIST_CAP).map((study, index) => {
     const mask = study.maskPath ? `，mask ${study.maskPath}` : '';
     return `${index + 1}. ${study.title}（${study.kind}）${study.imagePaths[0]}${mask}`;
   });
-  const more = found.length > LIST_CAP ? `\n其余 ${found.length - LIST_CAP} 套未列出。` : '';
+  const more = paired.length > LIST_CAP ? `\n其余 ${paired.length - LIST_CAP} 套未列出。` : '';
   const tail = subs.length > CHILD_CAP ? '\n只扫描了前 64 个子文件夹。' : '';
-  const message = found.length === 0
+  const message = paired.length === 0
     ? `RadViewer：${root.path} 里没有 DICOM 序列、NIfTI 或 NRRD。`
-    : `RadViewer：在 ${root.path} 找到 ${found.length} 套检查。\n${shown.join('\n')}${more}${tail}`;
-  return { folder: root.path, studies: found, truncated: subs.length > CHILD_CAP, message };
+    : `RadViewer：在 ${root.path} 找到 ${paired.length} 套检查。\n${shown.join('\n')}${more}${tail}`;
+  return { folder: root.path, studies: paired, truncated: subs.length > CHILD_CAP, message };
 }
 
 export async function resolveOpen(input) {
